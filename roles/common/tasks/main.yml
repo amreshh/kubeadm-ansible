@@ -1,0 +1,90 @@
+- name: "Disable selinux"
+  ansible.builtin.selinux:
+    state: disabled
+  notify: reboot
+
+- name: "Disable swap"
+  ansible.posix.mount:
+    path: "none"
+    fstype: "swap"
+    state: absent
+  notify: reboot
+
+- name: "Load overlay and br_netfilter"
+  community.general.modprobe:
+    name: "{{ modules }}"
+  with_items:
+    - overlay
+    - br_netfilter
+  loop_control:
+    loop_var: modules
+
+- name: "Enable net.bridge.bridge-nf-call-iptables"
+  ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+
+- name: "Enable net.ipv4.ip_forward"
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+
+- name: "Enable net.bridge.bridge-nf-call-ip6tables"
+  ansible.posix.sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    state: present
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+
+- name: "Add libcontainers repo"
+  ansible.builtin.get_url:
+    url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo"
+    dest: "/etc/yum.repos.d/libcontainers.repo"
+    mode: 0644
+
+- name: "Add libcontainers cri-o {{ cri_o_version }} repo"
+  ansible.builtin.get_url:
+    url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ cri_o_version }}/CentOS_8/devel:kubic:libcontainers:stable:cri-o:{{ cri_o_version }}.repo"
+    dest: "/etc/yum.repos.d/libcontainers-cri-o-{{ cri_o_version }}.repo"
+    mode: 0644
+
+- name: "Add kubernetes repo"
+  ansible.builtin.copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Install kubernetes and cri-o"
+  ansible.builtin.dnf:
+    name:
+      - bash-completion
+      - cri-o
+      - kubelet-{{ kubelet_version }}
+      - kubeadm-{{ kubeadm_version}}
+      - kubectl-{{ kubectl_version}}
+    state: present
+
+- name: "Ensure cri-o service is enabled and started"
+  ansible.builtin.debug:
+    msg: "enable and start crio service"
+  notify: "enable cri-o"
+  changed_when: true
+
+- name: "Ensure kubelet service is enabled and started"
+  ansible.builtin.debug:
+    msg: "enable and start kubelet service"
+  notify: "enable kubelet"
+  changed_when: true
+
+- name: "Enable kubectl bash completion for root user"
+  ansible.builtin.shell: echo "source <(kubectl completion bash)" >> $HOME/.bashrc
+
+- name: "Enable kubectl bash completion for vagrant user"
+  ansible.builtin.shell: echo "source <(kubectl completion bash)" >> $HOME/.bashrc
+  become_user: vagrant

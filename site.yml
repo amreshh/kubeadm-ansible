@@ -1,0 +1,17 @@
+- hosts: multi
+  remote_user: root
+  become: true
+  roles:
+    - common
+
+- hosts: control
+  remote_user: root
+  become: true
+  roles:
+    - control
+
+# - hosts: worker
+#   remote_user: root
+#   become: true
+#   roles:
+#     - worker

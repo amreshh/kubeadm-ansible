@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ansible = "*"
+ansible-lint = "*"
+ansiblemetrics = "*"
+ansible-builder = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3"

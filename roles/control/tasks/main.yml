@@ -1,0 +1,69 @@
+- name: "Make k8s root dir for configuration files"
+  ansible.builtin.file:
+    path: /root/k8s
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Make k8s config dir for vagrant user"
+  ansible.builtin.file:
+    path: /home/vagrant/k8s
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+
+- name: "Make .kube folder for vagrant user"
+  ansible.builtin.file:
+    path: /home/vagrant/.kube
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0775
+
+- name: "Copy hosts file"
+  ansible.builtin.template:
+    src: "hosts.j2"
+    dest: "/etc/hosts"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Copy kubeadm-crio configuration"
+  ansible.builtin.copy:
+    src: "kubeadm-crio.yml"
+    dest: "/root/k8s/kubeadm-crio.yml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Copy calico configuration"
+  ansible.builtin.copy:
+    src: "calico.yml"
+    dest: "/home/vagrant/k8s/calico.yml"
+    owner: vagrant
+    group: vagrant
+    mode: 0644
+
+- name: "Initialize control plane"
+  ansible.builtin.shell: kubeadm init --config=kubeadm-crio.yml --upload-certs | tee kubeadm-init.out
+  args:
+    chdir: /root/k8s/
+    creates: kubeadm-init.out
+
+- name: "Copy .kube folder for vagrant user"
+  ansible.builtin.copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: "/home/vagrant/.kube/config"
+    owner: vagrant
+    group: vagrant
+    mode: 0600
+    remote_src: yes
+
+- name: "Initialize calico network plugin"
+  ansible.builtin.shell: kubectl apply -f calico.yml | tee calico-init.out
+  args:
+    chdir: /home/vagrant/k8s/
+    creates: calico-init.out
+  become_user: vagrant

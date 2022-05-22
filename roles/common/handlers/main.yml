@@ -1,0 +1,18 @@
+- name: "reboot"
+  ansible.builtin.reboot:
+    reboot_timeout: 120
+    msg: "Rebooted by Ansible"
+
+- name: "enable cri-o"
+  ansible.builtin.systemd:
+    name: crio
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: "enable kubelet"
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+    daemon_reload: yes

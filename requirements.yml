@@ -1,0 +1,3 @@
+# pipenv run ansible-galaxy collection install -r requirements.yml
+collections:
+  - community.general
