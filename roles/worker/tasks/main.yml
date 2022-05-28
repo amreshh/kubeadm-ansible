@@ -8,7 +8,7 @@
 
 - name: "Join control plane"
   ansible.builtin.shell: "kubeadm join --token {{ kubeadm_token }} control:6443 --discovery-token-ca-cert-hash sha256:{{ kubeadm_discovery_token }} | tee kubeadm-join.out"
-  args:
-    chdir: /home/vagrant/k8s
-    creates: kubeadm-init.out
-  become_user: vagrant
+  # args:
+  #   chdir: /root/k8s
+  #   creates: kubeadm-init.out
+  
