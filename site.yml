@@ -4,14 +4,14 @@
   roles:
     - common
 
-- hosts: control
+- hosts: control_plane
   remote_user: root
   become: true
   roles:
     - control
 
-# - hosts: worker
-#   remote_user: root
-#   become: true
-#   roles:
-#     - worker
+- hosts: worker_nodes
+  remote_user: root
+  become: true
+  roles:
+    - worker

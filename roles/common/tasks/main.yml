@@ -1,3 +1,19 @@
+- name: "Make k8s root dir for configuration files"
+  ansible.builtin.file:
+    path: /root/k8s
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Make k8s config dir for vagrant user"
+  ansible.builtin.file:
+    path: /home/vagrant/k8s
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+
 - name: "Disable selinux"
   ansible.builtin.selinux:
     state: disabled
@@ -18,6 +34,14 @@
     - br_netfilter
   loop_control:
     loop_var: modules
+
+- name: "Make modules load on reboot"
+  ansible.builtin.copy:
+    src: 99-kubernetes-modules.conf
+    dest: /etc/modules-load.d/99-kubernetes-modules.conf
+    owner: root
+    group: root
+    mode: 0644
 
 - name: "Enable net.bridge.bridge-nf-call-iptables"
   ansible.posix.sysctl:

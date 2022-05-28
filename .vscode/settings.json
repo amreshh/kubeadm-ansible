@@ -1,6 +1,7 @@
 {
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
+  "ansibleVaultInline.keyfile": "vault_password.txt",
   "python.defaultInterpreterPath": "/home/amresh/.local/share/virtualenvs/kubeadm-ansible-KVRU_ojs/bin/python"
   
 }

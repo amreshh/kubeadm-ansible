@@ -2,7 +2,7 @@
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'libvirt'
 VAGRANTFILE_API_VERSION = "2"
-VAGRANTFILE_VM_BOX = "generic/rhel8"
+VAGRANTFILE_VM_BOX = "generic/rhel9"
 
 $provision = <<SCRIPT
   systemctl stop firewalld.service
