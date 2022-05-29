@@ -1,5 +1,6 @@
 # kubeadm-ansible
 
+Ansible playbook to deploy a Kubernetes cluster using kubeadmn and crio as container runtime.
 # Provision kubernetes cluster
 ```bash
 pipenv run ansible-playbook -i inventories/vagrant.ini site.yml --vault-password-file vault_password.txt
