@@ -16,3 +16,10 @@
     enabled: yes
     state: started
     daemon_reload: yes
+
+- name: "enable nfs-server"
+  ansible.builtin.systemd:
+    name: nfs-server
+    enabled: yes
+    state: started
+    daemon_reload: yes

@@ -87,12 +87,19 @@
 - name: "Install kubernetes and cri-o"
   ansible.builtin.dnf:
     name:
+      - nfs-utils
       - bash-completion
       - cri-o
       - kubelet-{{ kubelet_version }}
       - kubeadm-{{ kubeadm_version}}
       - kubectl-{{ kubectl_version}}
     state: present
+
+- name: "Ensure nfs-server service is enabled and started"
+  ansible.builtin.debug:
+   msg: "enable and start nfs-server service"
+  notify: "enable nfs-server"
+  changed_when: true
 
 - name: "Ensure cri-o service is enabled and started"
   ansible.builtin.debug:
